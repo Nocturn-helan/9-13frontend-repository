@@ -1,3 +1,6 @@
+const state = { data: null };
+let barChart = null;
+
 const loadData = async () => {
   $('#status').text('加载中...').show();
   try {
@@ -36,6 +39,23 @@ const renderCards = (data) => {
         </div>
       </div>
     `);
+  });
+};
+const renderBarChart = (data) => {
+  if (barChart === null) {
+    barChart = echarts.init(document.querySelector('#bar-chart'));
+  }
+  barChart.setOption({
+    title: { text: '各月奶茶销量', left: 'center' },
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0 },
+    xAxis: { data: data.months },
+    yAxis: { name: '杯' },
+    series: data.series.map(s => ({
+      name: s.category,
+      type: 'bar',
+      data: s.counts
+    }))
   });
 };
 
