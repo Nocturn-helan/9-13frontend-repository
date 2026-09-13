@@ -21,6 +21,7 @@ const loadData = async () => {
     renderCards(data);
     renderBarChart(data);
     renderLineChart(data);
+    renderPieChart(data);
   } catch (error) {
     $('#status').text('加载失败：' + error.message).show();
   }
@@ -96,7 +97,7 @@ const renderPieChart = (data) => {
   });
 
   pieChart.setOption({
-    title: { text: '各品类累计借阅占比', left: 'center' },
+    title: { text: '各类奶茶销量占比', left: 'center' },
     tooltip: { trigger: 'item', formatter: '{b}: {c} 册 ({d}%)' }, // 鼠标悬浮显示数量与百分比
     legend: { bottom: 0 },
     series: [
