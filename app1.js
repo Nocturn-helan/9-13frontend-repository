@@ -1,5 +1,7 @@
 const state = { data: null };
 let barChart = null;
+let lineChart = null;
+let pieChart = null;
 
 const loadData = async () => {
   $('#status').text('加载中...').show();
@@ -58,5 +60,64 @@ const renderBarChart = (data) => {
     }))
   });
 };
+const renderLineChart = (data) => {
+  if (lineChart !== null) {
+    lineChart.destroy();               // 防重复初始化
+  }
+  const ctx = document.querySelector('#line-chart');
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.months,
+      datasets: data.series.map(s => ({
+        label: s.category,
+        data: s.counts,
+        borderWidth: 1
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: '销量变化趋势（单位：杯）' }
+      }
+    }
+  });
+};
+const renderPieChart = (data) => {
+  if (pieChart === null) {
+    pieChart = echarts.init(document.querySelector('#pie-chart'));
+  }
+  
+  // 计算所有月份的总和，用于画饼图
+  const pieData = data.series.map(s => {
+    const total = s.counts.reduce((sum, n) => sum + n, 0);
+    return { name: s.category, value: total };
+  });
 
+  pieChart.setOption({
+    title: { text: '各品类累计借阅占比', left: 'center' },
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 册 ({d}%)' }, // 鼠标悬浮显示数量与百分比
+    legend: { bottom: 0 },
+    series: [
+      {
+        type: 'pie',
+        radius: '60%',          // 饼图大小
+        center: ['50%', '50%'], // 居中显示
+        data: pieData,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  });
+};
+window.addEventListener('resize', () => {
+  if (barChart) barChart.resize();
+  // Chart.js响应式默认自动处理，无需手动
+});
 loadData();
